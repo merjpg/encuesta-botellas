@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Encuesta sobre botellas reutilizables</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef5f2; --card:#ffffff; --ink:#12302b; --muted:#4f6b65; --line:#cfe0da;
+  --accent:#0e7c66; --accent-ink:#ffffff; --sun:#f2b544; --err:#b3261e;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1b18; --card:#162924; --ink:#e6f2ee; --muted:#9bb8b0; --line:#2b4640;
+    --accent:#3fc7a6; --accent-ink:#06231c; --sun:#f2b544; --err:#ff8a80; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1b18; --card:#162924; --ink:#e6f2ee; --muted:#9bb8b0; --line:#2b4640;
+  --accent:#3fc7a6; --accent-ink:#06231c; --sun:#f2b544; --err:#ff8a80; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 Figtree,system-ui,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:28px 18px 64px}
+header h1{font:700 clamp(1.8rem,5vw,2.6rem)/1.1 "Bricolage Grotesque",Figtree,sans-serif;margin:0 0 10px;letter-spacing:-.02em}
+header p{color:var(--muted);margin:0 0 6px;max-width:60ch}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);height:6px;background:var(--line);border-radius:3px;margin:22px 0;z-index:5;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--sun);transition:width .25s}
+fieldset{border:1px solid var(--line);background:var(--card);border-radius:14px;margin:0 0 16px;padding:18px 18px 14px}
+legend{padding:0 6px;font:600 1.02rem/1.35 Figtree,sans-serif;max-width:100%}
+.hint{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:9px;cursor:pointer;border:1px solid transparent}
+.opt:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.opt input{margin-top:4px;accent-color:var(--accent);width:18px;height:18px;flex:none}
+.opt:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.likert{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.likert label{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:10px 4px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:.82rem}
+.likert label b{font:700 1.25rem "Bricolage Grotesque",sans-serif}
+.likert label:has(input:checked){background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.likert input{position:absolute;opacity:0;pointer-events:none}
+.likert label:has(input:focus-visible){outline:3px solid var(--sun);outline-offset:2px}
+.sd{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 10px;align-items:center;margin:6px 0 14px}
+.sd .l{font-size:.9rem;text-align:right}.sd .r{font-size:.9rem}
+.sd .dots{display:flex;gap:6px}
+.sd .dots label{cursor:pointer}
+.sd .dots input{accent-color:var(--accent);width:20px;height:20px}
+.sd.head{color:var(--muted);font-size:.8rem}
+textarea,input[type=text],input[type=number],select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+textarea{min-height:96px;resize:vertical}
+:is(textarea,input,select):focus-visible,.opt:has(input:focus-visible){outline:3px solid var(--sun);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 label{font-size:.9rem;color:var(--muted);display:block}
+.grid2 label span{display:block;margin-bottom:4px}
+.err{color:var(--err);font-size:.88rem;margin:6px 0 0;display:none}
+fieldset.bad{border-color:var(--err)} fieldset.bad .err{display:block}
+button{font:600 1rem Figtree,sans-serif;border:0;border-radius:10px;padding:13px 22px;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.out{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.out h2{font:700 1.6rem "Bricolage Grotesque",sans-serif;margin:0 0 8px}
+.out dl{margin:16px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.out dt{font-weight:600;font-size:.92rem}.out dd{margin:2px 0 0;color:var(--muted)}
+.stop{display:none}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}.likert label{font-size:.72rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Encuesta sobre botellas reutilizables</h1>
+  <p>Estudio académico y de mercado para una empresa panameña de productos ecológicos. Es anónima y toma unos 5 minutos.</p>
+  <p>Tus respuestas se usarán solo con fines de investigación.</p>
+</header>
+<div class="bar" aria-hidden="true"><i id="prog"></i></div>
+
+<form id="f" novalidate>
+  <fieldset id="q0" data-req>
+    <legend>¿Eres estudiante universitario(a) de pregrado y tienes entre 18 y 25 años?</legend>
+    <label class="opt"><input type="radio" name="filtro" value="Sí"> Sí</label>
+    <label class="opt"><input type="radio" name="filtro" value="No"> No</label>
+    <p class="err">Elige una opción para continuar.</p>
+  </fieldset>
+  <fieldset class="stop" id="stop"><legend>Gracias por tu interés</legend><p>Esta encuesta es solo para estudiantes universitarios de pregrado de 18 a 25 años.</p></fieldset>
+
+  <div id="main" hidden>
+  <fieldset id="q1" data-req>
+    <legend>1. ¿Qué tan interesado(a) estarías en comprar una botella reutilizable de una marca ecológica panameña?</legend>
+    <div class="likert">
+      <label><input type="radio" name="q1" value="1 Nada interesado"><b>1</b>Nada interesado</label>
+      <label><input type="radio" name="q1" value="2 Poco interesado"><b>2</b>Poco interesado</label>
+      <label><input type="radio" name="q1" value="3 Neutral"><b>3</b>Neutral</label>
+      <label><input type="radio" name="q1" value="4 Interesado"><b>4</b>Interesado</label>
+      <label><input type="radio" name="q1" value="5 Muy interesado"><b>5</b>Muy interesado</label>
+    </div>
+    <p class="err">Elige un nivel de interés.</p>
+  </fieldset>
+
+  <fieldset id="q2" data-req>
+    <legend>2. ¿Cuáles son los tres factores más importantes al decidir comprar una botella reutilizable?</legend>
+    <p class="hint">Marca exactamente tres. <span id="cnt">0 de 3</span></p>
+    <label class="opt"><input type="checkbox" name="q2" value="Precio"> Precio</label>
+    <label class="opt"><input type="checkbox" name="q2" value="Durabilidad"> Durabilidad</label>
+    <label class="opt"><input type="checkbox" name="q2" value="Diseño y colores"> Diseño y colores</label>
+    <label class="opt"><input type="checkbox" name="q2" value="Material"> Material</label>
+    <label class="opt"><input type="checkbox" name="q2" value="Capacidad o tamaño"> Capacidad o tamaño</label>
+    <label class="opt"><input type="checkbox" name="q2" value="Que mantenga la temperatura"> Que mantenga la temperatura</label>
+    <label class="opt"><input type="checkbox" name="q2" value="Compromiso ambiental de la marca"> Compromiso ambiental de la marca</label>
+    <label class="opt"><input type="checkbox" name="q2" value="Recomendación de amigos o influencers"> Recomendación de amigos o influencers</label>
+    <p class="err">Marca exactamente tres factores.</p>
+  </fieldset>
+
+  <fieldset id="q3" data-req>
+    <legend>3. ¿Cuánto estarías dispuesto(a) a pagar por una botella reutilizable de buena calidad?</legend>
+    <label class="opt"><input type="radio" name="q3" value="Menos de B/. 10"> Menos de B/. 10</label>
+    <label class="opt"><input type="radio" name="q3" value="B/. 10 a 15"> B/. 10 a 15</label>
+    <label class="opt"><input type="radio" name="q3" value="B/. 16 a 25"> B/. 16 a 25</label>
+    <label class="opt"><input type="radio" name="q3" value="B/. 26 a 35"> B/. 26 a 35</label>
+    <label class="opt"><input type="radio" name="q3" value="Más de B/. 35"> Más de B/. 35</label>
+    <p class="err">Elige un rango de precio.</p>
+  </fieldset>
+
+  <fieldset id="q4" data-req>
+    <legend>4. Una marca ecológica panameña de botellas reutilizables debería ser percibida como:</legend>
+    <p class="hint">En cada fila, marca el punto que mejor refleja lo que esperas (1 a 5).</p>
+    <div id="sd"></div>
+    <p class="err">Completa las tres filas.</p>
+  </fieldset>
+
+  <fieldset id="q5" data-req>
+    <legend>5. ¿Qué estilo de botella preferirías?</legend>
+    <label class="opt"><input type="radio" name="q5" value="Minimalista de un solo color"> Minimalista de un solo color</label>
+    <label class="opt"><input type="radio" name="q5" value="Colores vivos y llamativos"> Colores vivos y llamativos</label>
+    <label class="opt"><input type="radio" name="q5" value="Ilustraciones de la cultura panameña"> Ilustraciones de la cultura panameña</label>
+    <label class="opt"><input type="radio" name="q5" value="Personalizable (nombre o logo de la universidad)"> Personalizable (nombre o logo de la universidad)</label>
+    <label class="opt"><input type="radio" name="q5" value="Colores neutros o tierra"> Colores neutros o tierra</label>
+    <p class="err">Elige un estilo.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>6. ¿Qué características adicionales te gustaría que tuviera una botella reutilizable que hoy no encuentras en el mercado?</legend>
+    <textarea name="q6" aria-label="Respuesta a la pregunta 6"></textarea>
+  </fieldset>
+
+  <fieldset>
+    <legend>7. ¿Qué esperas de una marca ecológica panameña y qué te haría confiar (o desconfiar) de que realmente es sostenible?</legend>
+    <textarea name="q7" aria-label="Respuesta a la pregunta 7"></textarea>
+  </fieldset>
+
+  <fieldset>
+    <legend>Sobre ti</legend>
+    <div class="grid2">
+      <label><span>Edad</span><input type="number" name="edad" min="18" max="25"></label>
+      <label><span>Género</span><select name="genero"><option value="">Prefiero no decir</option><option>Femenino</option><option>Masculino</option><option>Otro</option></select></label>
+      <label><span>Universidad</span><input type="text" name="uni"></label>
+      <label><span>Carrera</span><input type="text" name="carrera"></label>
+      <label><span>Ingreso o mesada mensual</span><select name="ingreso"><option value="">Prefiero no decir</option><option>Menos de B/. 100</option><option>B/. 100 a 300</option><option>B/. 301 a 600</option><option>Más de B/. 600</option></select></label>
+      <label><span>¿Usas una botella reutilizable?</span><select name="usa"><option value="">Selecciona</option><option>Sí</option><option>No</option></select></label>
+    </div>
+  </fieldset>
+
+  <button type="submit">Enviar respuestas</button>
+  </div>
+</form>
+
+<section class="out" id="out" aria-live="polite">
+  <h2>Gracias por responder</h2>
+  <p>Tu opinión ayuda a decidir cómo será la nueva línea de botellas reutilizables. Este es el resumen de lo que marcaste:</p>
+  <dl id="sum"></dl>
+  <button type="button" class="alt" id="copy">Copiar resumen</button>
+  <button type="button" class="alt" id="again">Responder de nuevo</button>
+</section>
+</div>
+
+<script>
+(function(){
+  var f=document.getElementById('f'), main=document.getElementById('main'), stop=document.getElementById('stop');
+  var rows=[["Costosa","Accesible"],["Tradicional","Moderna"],["Poco confiable","Confiable"]];
+  var sd=document.getElementById('sd');
+  var head='<div class="sd head"><span class="l">Polo izquierdo = 1</span><span>1 · 2 · 3 · 4 · 5</span><span class="r">Polo derecho = 5</span></div>';
+  sd.innerHTML=head+rows.map(function(r,i){
+    var dots=[1,2,3,4,5].map(function(n){return '<label><input type="radio" name="sd'+i+'" value="'+n+'" aria-label="'+r[0]+' a '+r[1]+': '+n+'"></label>';}).join('');
+    return '<div class="sd"><span class="l">'+r[0]+'</span><span class="dots">'+dots+'</span><span class="r">'+r[1]+'</span></div>';
+  }).join('');
+
+  function val(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+  function checked(){return Array.prototype.map.call(f.querySelectorAll('input[name="q2"]:checked'),function(e){return e.value;});}
+  function ok(id){
+    if(id==='q2')return checked().length===3;
+    if(id==='q4')return rows.every(function(_,i){return val('sd'+i);});
+    var n=id==='q0'?'filtro':id;return !!val(n);
+  }
+  function progress(){
+    var ids=['q1','q2','q3','q4','q5'],d=ids.filter(ok).length;
+    document.getElementById('prog').style.width=(d/ids.length*100)+'%';
+  }
+  f.addEventListener('change',function(e){
+    var t=e.target;
+    if(t.name==='filtro'){var si=t.value==='Sí';main.hidden=!si;stop.style.display=si?'none':'block';document.getElementById('q0').classList.remove('bad');}
+    if(t.name==='q2'){
+      var c=checked().length;
+      if(c>3){t.checked=false;c=3;}
+      document.getElementById('cnt').textContent=c+' de 3';
+    }
+    var fs=t.closest('fieldset');if(fs&&fs.dataset.req!==undefined&&ok(fs.id))fs.classList.remove('bad');
+    progress();
+  });
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var ids=['q0','q1','q2','q3','q4','q5'],first=null;
+    if(val('filtro')!=='Sí'){document.getElementById('q0').classList.add('bad');return;}
+    ids.forEach(function(id){var fs=document.getElementById(id),good=ok(id);fs.classList.toggle('bad',!good);if(!good&&!first)first=fs;});
+    if(first){first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    var data=[
+      ['1. Interés en comprar',val('q1')],
+      ['2. Factores de compra',checked().join(', ')],
+      ['3. Precio que pagarías',val('q3')],
+      ['4. Imagen de marca',rows.map(function(r,i){return r[0]+' – '+r[1]+': '+val('sd'+i);}).join(' | ')],
+      ['5. Estilo preferido',val('q5')],
+      ['6. Características adicionales',f.q6.value.trim()||'Sin respuesta'],
+      ['7. Expectativas y confianza',f.q7.value.trim()||'Sin respuesta']
+    ];
+    var dl=document.getElementById('sum');dl.innerHTML='';
+    data.forEach(function(p){
+      var dt=document.createElement('dt'),dd=document.createElement('dd');
+      dt.textContent=p[0];dd.textContent=p[1];dl.appendChild(dt);dl.appendChild(dd);
+    });
+    f.style.display='none';document.querySelector('.bar').style.display='none';
+    var out=document.getElementById('out');out.style.display='block';out.scrollIntoView({behavior:'smooth'});
+    out.dataset.text=data.map(function(p){return p[0]+': '+p[1];}).join('\n');
+  });
+  document.getElementById('copy').addEventListener('click',function(){
+    var t=document.getElementById('out').dataset.text||'',b=this;
+    try{navigator.clipboard.writeText(t).then(function(){b.textContent='Resumen copiado';});}catch(x){b.textContent='No se pudo copiar';}
+  });
+  document.getElementById('again').addEventListener('click',function(){
+    f.reset();f.style.display='';main.hidden=true;stop.style.display='none';
+    document.querySelector('.bar').style.display='';document.getElementById('out').style.display='none';
+    document.getElementById('cnt').textContent='0 de 3';progress();window.scrollTo({top:0});
+  });
+})();
+</script>
+</body>
+</html>
